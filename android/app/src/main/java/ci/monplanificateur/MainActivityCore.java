@@ -54,7 +54,7 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MainActivity extends Activity {
+public class MainActivityCore extends Activity {
     private static final int PICK_FILE = 1401;
     private static final int NOTIFICATION_PERMISSION = 1402;
     private static final int CREATE_BACKUP = 1403;
@@ -173,18 +173,18 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void scheduleAlarm(String date, String eventId, String time, String title, boolean sound) {
             runOnUiThread(() -> scheduleAlarmFromUi(date, eventId, time, title, sound));
         }
-        @JavascriptInterface public void printPlanner() { runOnUiThread(MainActivity.this::printPlanner); }
+        @JavascriptInterface public void printPlanner() { runOnUiThread(MainActivityCore.this::printPlanner); }
         @JavascriptInterface public void scheduleAlarms(String json) {
             runOnUiThread(() -> {
                 try { scheduleAlarmBatch(new JSONArray(json), true); }
-                catch (Exception error) { Toast.makeText(MainActivity.this, "Impossible de programmer tous les rappels.", Toast.LENGTH_LONG).show(); }
+                catch (Exception error) { Toast.makeText(MainActivityCore.this, "Impossible de programmer tous les rappels.", Toast.LENGTH_LONG).show(); }
             });
         }
         @JavascriptInterface public void cancelAlarm(String date, String eventId) {
-            runOnUiThread(() -> AlarmReceiver.cancel(MainActivity.this, date, eventId));
+            runOnUiThread(() -> AlarmReceiver.cancel(MainActivityCore.this, date, eventId));
         }
         @JavascriptInterface public void cancelLegacyAlarm(String date, int slot) {
-            runOnUiThread(() -> AlarmReceiver.cancelLegacy(MainActivity.this, date, slot));
+            runOnUiThread(() -> AlarmReceiver.cancelLegacy(MainActivityCore.this, date, slot));
         }
         @JavascriptInterface public void restoreAlarms(String json) {
             runOnUiThread(() -> {
@@ -649,7 +649,7 @@ public class MainActivity extends Activity {
         webView.evaluateJavascript("window.handleAndroidBack ? window.handleAndroidBack() : false", value -> {
             if ("true".equals(value)) return;
             if (webView != null && webView.canGoBack()) webView.goBack();
-            else MainActivity.super.onBackPressed();
+            else MainActivityCore.super.onBackPressed();
         });
     }
 

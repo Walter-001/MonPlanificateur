@@ -27,6 +27,8 @@ L’APK est généré dans `app/build/outputs/apk/debug/app-debug.apk`. Sur Wind
 
 Le fichier `..\index.html` est la source unique de l’interface web; la compilation copie cette version dans les ressources Android.
 
+`MainActivity.kt` est le point d’entrée Kotlin déclaré dans le manifeste. Il hérite de `MainActivityCore.java`, qui conserve l’implémentation Android existante et ses intégrations Java.
+
 ## Mise à jour interface 1.6.2
 
 L’accueil utilise une progression ludique originale : série de jours actifs, XP quotidien calculé à partir des tâches terminées, mission du jour et navigation par sections. La palette émeraude, citron, corail et violet, les cartes en relief et le logo calendrier-coché ont été harmonisés. Les données et fonctions existantes sont conservées.

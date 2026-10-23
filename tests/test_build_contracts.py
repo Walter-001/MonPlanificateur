@@ -18,13 +18,25 @@ class BuildContractTests(unittest.TestCase):
         self.assertFalse((ROOT / "ios" / "MonPlanificateur" / "Web" / "index.html").exists())
 
     def test_reminder_sound_is_preserved_by_both_native_paths(self):
-        android_source = (ROOT / "android" / "app" / "src" / "main" / "java" / "ci" / "monplanificateur" / "MainActivity.java").read_text(encoding="utf-8")
+        android_source = (ROOT / "android" / "app" / "src" / "main" / "java" / "ci" / "monplanificateur" / "MainActivityCore.java").read_text(encoding="utf-8")
         ios_source = (ROOT / "ios" / "MonPlanificateur" / "PlannerViewController.swift").read_text(encoding="utf-8")
 
         self.assertIn('AlarmReceiver.schedule(this, date, eventId, time, title, sound)', android_source)
         self.assertIn('row["sound"] as? Bool ?? true, when)', ios_source)
         self.assertIn('content.sound = sound ? .default : nil', ios_source)
         self.assertIn('for (date, id, time, title, sound, when) in valid', ios_source)
+
+    def test_android_manifest_activity_is_the_kotlin_entry_point(self):
+        android_root = ROOT / "android"
+        manifest = (android_root / "app" / "src" / "main" / "AndroidManifest.xml").read_text(encoding="utf-8")
+        activity = (android_root / "app" / "src" / "main" / "java" / "ci" / "monplanificateur" / "MainActivity.kt").read_text(encoding="utf-8")
+        implementation = (android_root / "app" / "src" / "main" / "java" / "ci" / "monplanificateur" / "MainActivityCore.java").read_text(encoding="utf-8")
+        build = (android_root / "app" / "build.gradle").read_text(encoding="utf-8")
+
+        self.assertIn('android:name=".MainActivity"', manifest)
+        self.assertIn("class MainActivity : MainActivityCore()", activity)
+        self.assertIn("public class MainActivityCore extends Activity", implementation)
+        self.assertIn("org.jetbrains.kotlin.android", build)
 
 
 if __name__ == "__main__":
