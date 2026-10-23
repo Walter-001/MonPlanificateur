@@ -1,0 +1,17 @@
+# Android/Gradle build outputs and machine-local settings
+.gradle/
+**/.gradle/
+build/
+**/build/
+local.properties
+**/local.properties
+
+# IDE and operating-system files
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Python test artifacts
+__pycache__/
+*.py[cod]

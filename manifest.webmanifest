@@ -1,0 +1,1 @@
+{"name":"Mon planificateur des tâches de la journée","short_name":"Mon plan","description":"Planifie ta journée et prends soin de toi.","lang":"fr","start_url":"./index.html","display":"standalone","orientation":"portrait","background_color":"#f3faf6","theme_color":"#118a63","icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
