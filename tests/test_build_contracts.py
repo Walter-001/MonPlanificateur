@@ -37,6 +37,23 @@ class BuildContractTests(unittest.TestCase):
         self.assertIn("class MainActivity : MainActivityCore()", activity)
         self.assertIn("public class MainActivityCore extends Activity", implementation)
         self.assertIn("org.jetbrains.kotlin.android", build)
+        self.assertIn("versionName '1.6.5'", build)
+
+    def test_android_quick_add_shortcut_and_haptic_feedback(self):
+        android_root = ROOT / "android"
+        manifest = (android_root / "app" / "src" / "main" / "AndroidManifest.xml").read_text(encoding="utf-8")
+        shortcuts = (android_root / "app" / "src" / "main" / "res" / "xml" / "shortcuts.xml").read_text(encoding="utf-8")
+        implementation = (android_root / "app" / "src" / "main" / "java" / "ci" / "monplanificateur" / "MainActivityCore.java").read_text(encoding="utf-8")
+        html = (ROOT / "index.html").read_text(encoding="utf-8")
+
+        self.assertIn('android:name="android.app.shortcuts"', manifest)
+        self.assertIn('android:action="ci.monplanificateur.ADD_TASK"', shortcuts)
+        self.assertIn("ACTION_QUICK_ADD.equals(intent.getAction())", implementation)
+        self.assertIn("document.getElementById('quickAddBtn')?.click()", implementation)
+        self.assertIn("HapticFeedbackConstants.KEYBOARD_TAP", implementation)
+        self.assertIn("document.documentElement.classList.add('android-native')", html)
+        self.assertIn(".android-native #plannerNav .nav-item{min-width:0;min-height:48px", html)
+        self.assertIn('id="toastMessage" role="status" aria-live="polite"', html)
 
 
 if __name__ == "__main__":

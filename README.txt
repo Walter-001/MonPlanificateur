@@ -1,6 +1,8 @@
-MON PLANIFICATEUR — APPLICATION ANDROID 1.6.4
+MON PLANIFICATEUR — APPLICATION ANDROID 1.6.5
 
-Aucun APK n’est inclus dans ce dossier source. Pour créer l’APK Android 1.6.4, installe le JDK 17 et le SDK Android 35, puis lance `android\gradlew.bat assembleDebug`. Le fichier généré se trouve dans `android\app\build\outputs\apk\debug\app-debug.apk`.
+L’APK Android 1.6.5 prêt à installer est fourni : `Mon-planificateur-Android-1.6.5.apk`. Pour le reconstruire, installe le JDK 17 et le SDK Android 35, puis lance `android\gradlew.bat assembleDebug`. Le fichier généré se trouve dans `android\app\build\outputs\apk\debug\app-debug.apk`.
+
+Téléchargement direct : https://github.com/Walter-001/MonPlanificateur/releases/download/v1.6.5/Mon-planificateur-Android-1.6.5.apk
 
 Le dossier android contient aussi le projet Android Studio et le wrapper Gradle. Le SDK Android 35 et ses licences doivent être installés et acceptés avant la compilation.
 
@@ -37,3 +39,5 @@ Mise à jour 1.6.2 : « Ta quête du jour » et son titre passent au-dessus de �
 Mise à jour 1.6.3 / 1.1.3 : le bouton d’impression ouvre le dialogue natif, le bilan ne présente plus le sélecteur de date de référence et ses flèches, et chaque rappel permet d’activer ou de couper son. Le menu Date et la plage personnalisée restent disponibles.
 
 Mise à jour 1.6.4 / 1.1.4 : le logo Daily Flow fourni est intégré à l’en-tête, aux icônes de lancement Android et iOS et au manifeste de l’application web installable. L’image originale est conservée dans les projets source.
+
+Mise à jour Android 1.6.5 : un raccourci « Ajouter » est accessible en maintenant l’icône de l’application; les actions principales ont un retour haptique et une meilleure prise en charge des lecteurs d’écran.

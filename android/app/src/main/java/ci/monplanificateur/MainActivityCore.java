@@ -27,6 +27,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+import android.view.HapticFeedbackConstants;
 import android.window.OnBackInvokedDispatcher;
 
 import com.google.android.gms.tasks.Tasks;
@@ -55,6 +56,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivityCore extends Activity {
+    private static final String ACTION_QUICK_ADD = "ci.monplanificateur.ADD_TASK";
     private static final int PICK_FILE = 1401;
     private static final int NOTIFICATION_PERMISSION = 1402;
     private static final int CREATE_BACKUP = 1403;
@@ -156,6 +158,10 @@ public class MainActivityCore extends Activity {
 
     private void processReminderIntent(Intent intent) {
         if (intent == null || !pageLoaded) return;
+        if (ACTION_QUICK_ADD.equals(intent.getAction())) {
+            intent.setAction(Intent.ACTION_MAIN);
+            webView.evaluateJavascript("(function(){document.getElementById('quickAddBtn')?.click()})()", null);
+        }
         int notificationId = intent.getIntExtra("reminderNotificationId", Integer.MIN_VALUE);
         if (notificationId != Integer.MIN_VALUE) AlarmReceiver.cancelNotification(this, notificationId);
         if ("done".equals(intent.getStringExtra("plannerAction"))) {
@@ -170,6 +176,11 @@ public class MainActivityCore extends Activity {
     }
 
     private class PlannerBridge {
+        @JavascriptInterface public void hapticFeedback() {
+            runOnUiThread(() -> {
+                if (webView != null) webView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
+            });
+        }
         @JavascriptInterface public void scheduleAlarm(String date, String eventId, String time, String title, boolean sound) {
             runOnUiThread(() -> scheduleAlarmFromUi(date, eventId, time, title, sound));
         }

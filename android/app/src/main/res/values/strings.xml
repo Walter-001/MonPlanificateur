@@ -1,0 +1,5 @@
+<resources>
+    <string name="shortcut_add_short">Ajouter</string>
+    <string name="shortcut_add_long">Ajouter une tâche</string>
+    <string name="shortcut_add_disabled">Ouvrez l’application pour ajouter une tâche.</string>
+</resources>
