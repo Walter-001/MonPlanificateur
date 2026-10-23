@@ -134,7 +134,7 @@ html{scroll-behavior:smooth}body{background:radial-gradient(ellipse at 10% 0%,#d
 @media(prefers-reduced-motion:reduce){.modal-card,.quick-add-fab{animation:none;transition:none}}
 </style>
 
-<style>.unscheduled-wrap{margin:10px 0 8px;padding:10px 12px;border-radius:14px;background:#f6f5fc;border:1px dashed #dcd9ee}.unscheduled-heading{font-size:11px;font-weight:800;color:#746fbd;margin:0 0 4px}.event-time:invalid{border-color:#c9cddd}</style>
+<style>.unscheduled-wrap{margin:10px 0 8px;padding:10px 12px;border-radius:14px;background:#f6f5fc;border:1px dashed #dcd9ee}.unscheduled-heading{font-size:11px;font-weight:800;color:#746fbd;margin:0 0 4px}.event-time:invalid{border-color:#c9cddd}.calendar-add{width:100%;min-height:44px;margin-top:2px}</style>
 
 <style>
 .import-main-btn{border:0!important;border-radius:14px!important;padding:10px 15px!important;background:linear-gradient(135deg,#24bd81,#0d8d67)!important;color:#fff!important;font-size:12px!important;font-weight:900!important;box-shadow:0 6px 16px #13875f35!important;white-space:nowrap}.import-main-btn:hover{background:linear-gradient(135deg,#169e70,#087450)!important;transform:translateY(-1px)}.import-label-small{display:none}
@@ -142,12 +142,119 @@ html{scroll-behavior:smooth}body{background:radial-gradient(ellipse at 10% 0%,#d
 @media(max-width:520px){.import-label-wide{display:none}.import-label-small{display:inline}.import-main-btn{padding:7px 10px!important}.top-actions .import-main-btn{font-size:11px!important}}
 </style>
 <style>
-.android-native #plannerNav .nav-item{min-width:0;min-height:48px;flex:1;padding-left:2px;padding-right:2px}
-.android-native #plannerNav .nav-add{min-width:48px;width:48px;height:48px;flex:0 0 48px}
+:root.android-native{
+  --bg:#F8FBF9;--paper:#FFFFFF;--surface:#FFFFFF;--ink:#14241F;--muted:#53655F;--line:#E6EEEA;
+  --accent:#19C37D;--on-accent:#04281C;--accent-ink:#0A7C4C;--accent-soft:#D5F5E6;
+  --sky:#2FA4F5;--sky-soft:#D9EEFF;--sky-ink:#0B5A8C;
+  --violet:#8B6CF2;--violet-soft:#E9E3FF;--violet-ink:#5A3FC4;
+  --coral:#FF6B81;--coral-soft:#FFE2E7;--coral-ink:#B5223F;
+  --sun:#FFB92E;--sun-soft:#FFF0C2;--sun-ink:#8A5A00;--now:#F0405A;
+  --grad-hero:linear-gradient(115deg,#7BF2B4 0%,#3FDCC4 55%,#62C9FF 100%);
+  --grad-add:linear-gradient(135deg,#6545C9,#B5223F);--on-hero:#04281C;
+  --radius:22px;--radius-s:14px;--shadow:0 1px 2px rgba(20,36,31,.04),0 10px 28px rgba(60,90,80,.09);
+  color-scheme:light dark;
+}
+@media(prefers-color-scheme:dark){
+  :root.android-native:not([data-theme="light"]){
+    --bg:#0E1513;--paper:#17211E;--surface:#17211E;--ink:#EAF3F0;--muted:#A3B8B1;--line:#25322E;
+    --accent:#3EE0A0;--accent-ink:#6FF0BB;--accent-soft:#183A2E;
+    --sky-soft:#173449;--sky-ink:#8FD0FF;--violet-soft:#2A2250;--violet-ink:#C1B0FF;
+    --coral-soft:#4A2029;--coral-ink:#FF9DAD;--sun-soft:#463507;--sun-ink:#FFD26B;
+    --now:#FF7387;--grad-hero:linear-gradient(115deg,#183A2E 0%,#173449 100%);
+    --grad-add:linear-gradient(135deg,#6545C9,#A7334B);--on-hero:#EAF3F0;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.3);
+  }
+}
+.android-native body{background:radial-gradient(circle at 105% -5%,var(--accent-soft) 0,transparent 42%),radial-gradient(circle at -10% 45%,var(--violet-soft) 0,transparent 38%),radial-gradient(circle at 100% 85%,var(--coral-soft) 0,transparent 35%),var(--bg)!important;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5}
+.android-native .shell{max-width:720px;padding:20px 16px calc(112px + env(safe-area-inset-bottom))}
+.android-native h1{font-size:30px;letter-spacing:-1px;color:var(--ink)}
+.android-native h2{font-size:17px;letter-spacing:-.2px;color:var(--ink)}
+.android-native .caption,.android-native .sub,.android-native .hint,.android-native .well-note,.android-native .goal-meta,.android-native .m{color:var(--muted);font-size:13px}
+.android-native .topbar{background:transparent;border:0;box-shadow:none;backdrop-filter:none;padding:4px 0}
+.android-native .brandmark{background:transparent!important;box-shadow:none!important}
+.android-native .reward-pill{background:var(--sun-soft);color:var(--sun-ink);border:0;box-shadow:none;border-radius:99px}
+.android-native .xp-pill{background:var(--violet-soft);color:var(--violet-ink)}
+.android-native .top-actions button{background:var(--surface);border:1px solid var(--line);box-shadow:none;color:var(--ink);font-size:12px!important;min-height:44px;border-radius:12px}
+.android-native .hero{background:transparent;color:var(--ink);border:0;box-shadow:none;padding:6px 2px 4px;border-radius:0}
+.android-native .hero:before,.android-native .hero:after{display:none}
+.android-native .hero h1,.android-native .progress-copy{color:var(--ink)}
+.android-native .eyebrow{letter-spacing:0;font-size:13px;font-weight:700;color:var(--accent-ink)}
+.android-native .progress-track{background:var(--accent-soft);border:0;height:8px}
+.android-native .progress-fill{background:linear-gradient(90deg,#19C37D,#3FDCC4,#62C9FF);box-shadow:none}
+.android-native .date-pill{background:var(--surface);color:var(--ink);box-shadow:none;border:1px solid var(--line)}
+.android-native .date-pill input{color:var(--ink)}
+.android-native .copy-yesterday{background:var(--violet-soft);color:var(--violet-ink);border:0;box-shadow:none}
+.android-native .week{grid-template-columns:44px repeat(7,minmax(0,1fr)) 44px;align-items:stretch;gap:6px}
+.android-native .day{background:var(--surface);border:1px solid var(--line);box-shadow:none;color:var(--muted);border-radius:15px;min-height:54px}
+.android-native .day:hover{transform:none;box-shadow:none}
+.android-native .day small{font-size:11px}
+.android-native .day.active{background:var(--accent);border-color:var(--accent);color:var(--on-accent);box-shadow:0 8px 18px rgba(25,195,125,.25);font-weight:800}
+.android-native .day.today:not(.active){border-color:var(--coral);color:var(--coral-ink)}
+.android-native .week-arrow{background:var(--surface);border:1px solid var(--line);color:var(--ink);min-width:44px;min-height:48px}
+.android-native .next-task{background:var(--grad-hero);color:var(--on-hero);border:0;border-radius:var(--radius);box-shadow:var(--shadow)}
+.android-native .next-task *{color:var(--on-hero)}
+.android-native .next-task-label{text-transform:none;letter-spacing:0;font-size:13px;font-weight:600}
+.android-native .next-task-title{font-weight:800;font-size:19px}
+.android-native .next-task-icon{background:rgba(255,255,255,.32)}
+.android-native .next-task-done,.android-native .next-task-link{background:var(--surface);color:var(--accent-ink)!important;box-shadow:none;border:0;min-width:48px;min-height:48px}
+.android-native .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.android-native .card:focus-within{box-shadow:var(--shadow)}
+.android-native .tile.green{background:var(--accent-soft);color:var(--accent-ink)}
+.android-native .tile.blue{background:var(--sky-soft);color:var(--sky-ink)}
+.android-native .tile.purple{background:var(--violet-soft);color:var(--violet-ink)}
+.android-native .tile.pink{background:var(--coral-soft);color:var(--coral-ink)}
+.android-native .tile.yellow{background:var(--sun-soft);color:var(--sun-ink)}
+.android-native .goal{background:var(--violet-soft);border-color:transparent}
+.android-native .quote{background:var(--sun-soft);border-color:transparent}
+.android-native .quote p,.android-native .quote small{color:var(--sun-ink)}
+.android-native .import-card{background:var(--sky-soft);border-color:transparent}
+.android-native .well-card:nth-child(1){background:var(--sky-soft)}
+.android-native .well-card:nth-child(2){background:var(--accent-soft)}
+.android-native .well-card:nth-child(3){background:var(--sun-soft)}
+.android-native .well-card:nth-child(4){background:var(--violet-soft)}
+.android-native .well-card{border:0}
+.android-native .count{background:var(--accent-soft);color:var(--accent-ink);font-weight:700}
+.android-native .event-row,.android-native .slot,.android-native .priority{border-color:var(--line)}
+.android-native .event-time,.android-native .event-title,.android-native .task-input,.android-native .other-row input[type=text],.android-native .form-control{background:transparent;color:var(--ink);border-color:var(--line)!important;border-radius:12px}
+.android-native .event-title{font-size:15px}
+.android-native .event-time{background:var(--violet-soft);color:var(--violet-ink);border:0!important;font-weight:700}
+.android-native .check{border:2px solid var(--muted);width:22px;height:22px}
+.android-native .check:checked{background:var(--accent);border-color:var(--accent)}
+.android-native .event-row.done .event-title,.android-native .slot.done .task-input{color:var(--muted)}
+.android-native .alarm-btn{width:48px;height:48px;background:var(--sun-soft);color:var(--sun-ink);border-radius:12px}
+.android-native .alarm-btn.on{background:var(--accent);color:var(--on-accent)}
+.android-native .priority:nth-child(5n+1) .number{background:var(--accent-soft)!important;color:var(--accent-ink)!important}
+.android-native .priority:nth-child(5n+2) .number{background:var(--sky-soft)!important;color:var(--sky-ink)!important}
+.android-native .priority:nth-child(5n+3) .number{background:var(--violet-soft)!important;color:var(--violet-ink)!important}
+.android-native .priority:nth-child(5n+4) .number{background:var(--coral-soft)!important;color:var(--coral-ink)!important}
+.android-native .priority:nth-child(5n+5) .number{background:var(--sun-soft)!important;color:var(--sun-ink)!important}
+.android-native .well-card{border:1px solid var(--line);border-radius:16px}
+.android-native .well-card button,.android-native .water-controls button,.android-native .stepper button{background:var(--surface);color:var(--accent);border:1px solid var(--line);box-shadow:none;min-width:48px;min-height:48px;border-radius:12px}
+.android-native .schedule-range,.android-native .outside-hours,.android-native .schedule-empty{color:var(--muted);border-color:var(--line)}
+.android-native .schedule-range select,.android-native .event-detail-fields textarea{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:12px}
+.android-native #plannerNav{background:color-mix(in srgb,var(--surface) 94%,transparent);border:1px solid var(--line);box-shadow:0 10px 30px rgba(60,90,80,.16);border-radius:26px}
+.android-native #plannerNav .nav-item{min-width:0;min-height:48px;flex:1;padding-left:2px;padding-right:2px;color:var(--muted)}
+.android-native #plannerNav .nav-item small{font-size:12px;font-weight:600}
+.android-native #plannerNav .nav-item.active{background:transparent;color:var(--accent-ink)}
+.android-native #plannerNav .nav-add{min-width:54px;width:54px;height:54px;flex:0 0 54px;background:var(--grad-add)!important;color:#fff!important;box-shadow:0 6px 14px rgba(139,108,242,.3)!important}
+.android-native #plannerNav .nav-add small{color:#fff}
+.android-native .primary-action,.android-native .import-main-btn{background:var(--accent)!important;color:var(--on-accent)!important;box-shadow:none!important;border-radius:var(--radius-s)!important;min-height:48px;font-weight:800}
+.android-native .secondary-action{background:var(--surface);color:var(--ink)!important;border-color:var(--line)!important;min-height:48px}
+.android-native .modal-overlay{background:rgba(16,23,21,.58)}
+.android-native .modal-card{background:var(--surface);border:1px solid var(--line);color:var(--ink)}
+.android-native .modal-close{width:48px;height:48px;background:var(--accent-soft);color:var(--accent);border-radius:12px}
 .android-native .form-control{min-height:48px}
-.android-native .modal-close{width:48px;height:48px}
-.android-native .next-task-done{width:48px;height:48px}
-.android-native :focus-visible{outline:3px solid #354f82;outline-offset:3px}
+.android-native .calendar-add{width:100%;min-height:48px;margin-top:2px}
+.android-native .reminder-option,.android-native .import-edit-row{background:var(--bg);color:var(--muted);border-color:var(--line)}
+.android-native .toast{background:var(--ink);color:var(--bg)}
+.android-native .saved-state{color:var(--muted)}
+.android-native .saved-state.pending{color:var(--now)}
+.android-native .saved-state.error{color:#B9533A}
+.android-native .now-line{display:flex;align-items:center;gap:8px;color:var(--now);font-size:12px;font-weight:600}
+.android-native .now-line:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--now)}
+.android-native .now-line:after{content:"";flex:1;height:1.5px;background:var(--now);opacity:.55}
+.android-native :focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+@media(max-width:800px){.android-native .shell{padding:16px 14px calc(108px + env(safe-area-inset-bottom))}.android-native .card{padding:17px 16px}.android-native #plannerNav .nav-item{padding:5px 3px}.android-native #plannerNav .nav-add{min-width:48px;width:48px;height:48px;flex-basis:48px}}
 @media(prefers-reduced-motion:reduce){.android-native *, .android-native *:before, .android-native *:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -198,6 +305,25 @@ if(typeof window.Android?.hapticFeedback==='function')document.documentElement.c
 const $=s=>document.querySelector(s), iso=d=>{let x=new Date(d.getTime()-d.getTimezoneOffset()*60000);return x.toISOString().slice(0,10)}, today=iso(new Date());
 const weekdays=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'], fullMonths=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 let selected=today, state={}, pendingImport=[], toastTimeout=null, undoAction=null, reportPeriod='day';
+
+function addCalendarAction(detail){
+if(typeof window.Android?.addToCalendar!=='function')return;
+const body=detail.querySelector('.event-detail-fields');
+if(!body||body.querySelector('.calendar-add'))return;
+detail.querySelector('summary').textContent='Note, répétition et agenda';
+const button=document.createElement('button');
+button.type='button';
+button.className='secondary-action calendar-add';
+button.textContent='Ajouter à l’agenda du téléphone';
+button.onclick=()=>{
+const row=detail.closest('.event-row');
+window.Android.addToCalendar(selected,row.querySelector('.event-time').value,row.querySelector('.event-title').value,body.querySelector('textarea').value,60,body.querySelector('select').value);
+};
+body.append(button);
+}
+document.addEventListener('toggle',event=>{
+if(event.target.matches('details.event-details')&&event.target.open)addCalendarAction(event.target);
+},true);
 
 // AJOUT DE LA LOGIQUE LOADER ET DEBOUNCE
 let saveTimeout;

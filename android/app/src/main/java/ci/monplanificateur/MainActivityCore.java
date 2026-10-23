@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.ContentValues;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
@@ -45,6 +46,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedHashSet;
@@ -61,6 +67,7 @@ public class MainActivityCore extends Activity {
     private static final int NOTIFICATION_PERMISSION = 1402;
     private static final int CREATE_BACKUP = 1403;
     private static final int RESTORE_BACKUP = 1404;
+    private static final int CALENDAR_PERMISSION = 1405;
     private WebView webView;
     private String pendingDate;
     private String pendingEventId;
@@ -70,6 +77,7 @@ public class MainActivityCore extends Activity {
     private String pendingBackup;
     private JSONArray pendingRestoredAlarms;
     private JSONArray pendingBatchAlarms;
+    private CalendarEventDraft pendingCalendarEvent;
     private boolean pageLoaded;
     private boolean awaitingExactAlarmSettings;
     private final ExecutorService executorService = Executors.newFixedThreadPool(2);
@@ -80,13 +88,11 @@ public class MainActivityCore extends Activity {
             getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
                     OnBackInvokedDispatcher.PRIORITY_DEFAULT, this::handleBackPressed);
         }
-        getWindow().setStatusBarColor(0xFFF3FAF6);
-        getWindow().setNavigationBarColor(0xFFF3FAF6);
         AlarmReceiver.ensureChannel(this);
         AlarmReceiver.rescheduleAll(this);
         FrameLayout frame = new FrameLayout(this);
         webView = new WebView(this);
-        webView.setBackgroundColor(0xFFF3FAF6);
+        webView.setBackgroundColor(getColor(R.color.planner_background));
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);
         webView.getSettings().setAllowFileAccess(true);
@@ -135,6 +141,16 @@ public class MainActivityCore extends Activity {
 
     @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CALENDAR_PERMISSION) {
+            CalendarEventDraft event = pendingCalendarEvent;
+            pendingCalendarEvent = null;
+            boolean granted = grantResults.length == 2
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                    && grantResults[1] == PackageManager.PERMISSION_GRANTED;
+            if (granted && event != null) chooseCalendarForEvent(event);
+            else Toast.makeText(this, "Autorise l’accès au calendrier pour y ajouter cette activité.", Toast.LENGTH_LONG).show();
+            return;
+        }
         if (requestCode == NOTIFICATION_PERMISSION && pendingBatchAlarms != null) {
             JSONArray batch = pendingBatchAlarms; pendingBatchAlarms = null;
             if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
@@ -183,6 +199,9 @@ public class MainActivityCore extends Activity {
         }
         @JavascriptInterface public void scheduleAlarm(String date, String eventId, String time, String title, boolean sound) {
             runOnUiThread(() -> scheduleAlarmFromUi(date, eventId, time, title, sound));
+        }
+        @JavascriptInterface public void addToCalendar(String date, String time, String title, String note, int durationMinutes, String repeat) {
+            runOnUiThread(() -> addToCalendarFromUi(date, time, title, note, durationMinutes, repeat));
         }
         @JavascriptInterface public void printPlanner() { runOnUiThread(MainActivityCore.this::printPlanner); }
         @JavascriptInterface public void scheduleAlarms(String json) {
@@ -251,6 +270,134 @@ public class MainActivityCore extends Activity {
                 .setResolution(new PrintAttributes.Resolution("planner", "Mon planificateur", 300, 300))
                 .setMinMargins(PrintAttributes.Margins.NO_MARGINS).build();
         manager.print("Mon planificateur", adapter, attributes);
+    }
+
+    private void addToCalendarFromUi(String date, String time, String title, String note, int durationMinutes, String repeat) {
+        if (date == null || date.trim().isEmpty()) {
+            Toast.makeText(this, "Choisis une date valide pour cette activité.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        final LocalDate day;
+        final boolean allDay = time == null || time.trim().isEmpty();
+        final long begin;
+        final long end;
+        try {
+            day = LocalDate.parse(date.trim());
+            if (allDay) {
+                begin = day.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+                end = day.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+            } else {
+                begin = day.atTime(LocalTime.parse(time.trim())).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+                end = begin + Math.max(15, Math.min(durationMinutes, 24 * 60)) * 60L * 1000L;
+            }
+        } catch (DateTimeParseException error) {
+            Toast.makeText(this, "La date ou l’heure de cette activité est invalide.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        String rule = null;
+        if ("daily".equals(repeat)) rule = "FREQ=DAILY";
+        else if ("weekdays".equals(repeat)) rule = "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR";
+        else if ("weekly".equals(repeat)) rule = "FREQ=WEEKLY";
+        CalendarEventDraft event = new CalendarEventDraft(
+                title == null || title.trim().isEmpty() ? "Activité" : title.trim(),
+                note == null ? "" : note, begin, end, allDay, rule);
+        if (checkSelfPermission(Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED
+                || checkSelfPermission(Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+            pendingCalendarEvent = event;
+            requestPermissions(new String[]{
+                    Manifest.permission.READ_CALENDAR,
+                    Manifest.permission.WRITE_CALENDAR
+            }, CALENDAR_PERMISSION);
+            return;
+        }
+        chooseCalendarForEvent(event);
+    }
+
+    private void chooseCalendarForEvent(CalendarEventDraft event) {
+        String[] projection = {
+                android.provider.CalendarContract.Calendars._ID,
+                android.provider.CalendarContract.Calendars.CALENDAR_DISPLAY_NAME
+        };
+        String selection = android.provider.CalendarContract.Calendars.VISIBLE + " = 1 AND "
+                + android.provider.CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL + " >= ?";
+        String[] selectionArgs = {
+                Integer.toString(android.provider.CalendarContract.Calendars.CAL_ACCESS_CONTRIBUTOR)
+        };
+        String sortOrder = android.provider.CalendarContract.Calendars.IS_PRIMARY
+                + " DESC, " + android.provider.CalendarContract.Calendars.CALENDAR_DISPLAY_NAME + " COLLATE LOCALIZED ASC";
+        List<Long> calendarIds = new ArrayList<>();
+        List<String> calendarNames = new ArrayList<>();
+        try (Cursor cursor = getContentResolver().query(
+                android.provider.CalendarContract.Calendars.CONTENT_URI,
+                projection, selection, selectionArgs, sortOrder)) {
+            if (cursor == null) {
+                Toast.makeText(this, "Impossible de lire les calendriers disponibles.", Toast.LENGTH_LONG).show();
+                return;
+            }
+            int idColumn = cursor.getColumnIndexOrThrow(android.provider.CalendarContract.Calendars._ID);
+            int nameColumn = cursor.getColumnIndexOrThrow(android.provider.CalendarContract.Calendars.CALENDAR_DISPLAY_NAME);
+            while (cursor.moveToNext()) {
+                calendarIds.add(cursor.getLong(idColumn));
+                calendarNames.add(cursor.getString(nameColumn));
+            }
+        } catch (SecurityException error) {
+            Toast.makeText(this, "L’accès au calendrier a été refusé. Autorise-le dans les réglages Android.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (calendarIds.isEmpty()) {
+            Toast.makeText(this, "Aucun calendrier visible et modifiable n’a été trouvé.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        new AlertDialog.Builder(this)
+                .setTitle("Choisir un calendrier")
+                .setItems(calendarNames.toArray(new String[0]), (dialog, which) ->
+                        insertCalendarEvent(calendarIds.get(which), event))
+                .setNegativeButton("Annuler", null)
+                .show();
+    }
+
+    private void insertCalendarEvent(long calendarId, CalendarEventDraft event) {
+        ContentValues values = new ContentValues();
+        values.put(android.provider.CalendarContract.Events.CALENDAR_ID, calendarId);
+        values.put(android.provider.CalendarContract.Events.TITLE, event.title);
+        values.put(android.provider.CalendarContract.Events.DESCRIPTION, event.note);
+        values.put(android.provider.CalendarContract.Events.DTSTART, event.begin);
+        values.put(android.provider.CalendarContract.Events.DTEND, event.end);
+        values.put(android.provider.CalendarContract.Events.ALL_DAY, event.allDay ? 1 : 0);
+        values.put(android.provider.CalendarContract.Events.EVENT_TIMEZONE, event.allDay
+                ? "UTC" : ZoneId.systemDefault().getId());
+        if (event.repeatRule != null) values.put(android.provider.CalendarContract.Events.RRULE, event.repeatRule);
+        try {
+            Uri inserted = getContentResolver().insert(android.provider.CalendarContract.Events.CONTENT_URI, values);
+            if (inserted == null) {
+                Toast.makeText(this, "L’agenda n’a pas pu enregistrer cette activité.", Toast.LENGTH_LONG).show();
+                return;
+            }
+            Toast.makeText(this, "Activité ajoutée à l’agenda.", Toast.LENGTH_LONG).show();
+        } catch (SecurityException error) {
+            Toast.makeText(this, "L’accès en écriture au calendrier a été refusé.", Toast.LENGTH_LONG).show();
+        } catch (IllegalArgumentException error) {
+            Toast.makeText(this, "Les informations de cette activité ne sont pas acceptées par l’agenda.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private static final class CalendarEventDraft {
+        final String title;
+        final String note;
+        final long begin;
+        final long end;
+        final boolean allDay;
+        final String repeatRule;
+
+        CalendarEventDraft(String title, String note, long begin, long end, boolean allDay, String repeatRule) {
+            this.title = title;
+            this.note = note;
+            this.begin = begin;
+            this.end = end;
+            this.allDay = allDay;
+            this.repeatRule = repeatRule;
+        }
     }
 
     private void scheduleAlarmBatch(JSONArray alarms, boolean askPermission) {

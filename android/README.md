@@ -1,12 +1,12 @@
 # Mon planificateur — application Android
 
-Version 1.6.5 · application hors ligne, sans compte · Android 8.0 (API 26) ou ultérieur.
+Version source 1.6.9 · application hors ligne, sans compte · Android 8.0 (API 26) ou ultérieur.
 
 ## Installation
 
 Aucun APK précompilé n’est fourni dans ce dossier source. Pour générer et installer la version de développement, compile le projet avec les prérequis indiqués ci-dessous; l’APK sera créé dans `app/build/outputs/apk/debug/app-debug.apk`. Un APK de développement déjà installé ne peut être mis à jour que par un paquet signé avec la même clé.
 
-Télécharger l’APK Android 1.6.5 : https://github.com/Walter-001/MonPlanificateur/releases/download/v1.6.5/Mon-planificateur-Android-1.6.5.apk
+Dernière version publiée (1.6.5) : https://github.com/Walter-001/MonPlanificateur/releases/download/v1.6.5/Mon-planificateur-Android-1.6.5.apk
 
 ## Utilisation
 
@@ -32,6 +32,14 @@ Le fichier `..\index.html` est la source unique de l’interface web; la compila
 `MainActivity.kt` est le point d’entrée Kotlin déclaré dans le manifeste. Il hérite de `MainActivityCore.java`, qui conserve l’implémentation Android existante et ses intégrations Java.
 
 Sur Android 7.1+, maintiens l’icône de l’application appuyée pour ouvrir directement « Ajouter une tâche ». Les confirmations de tâches et rappels utilisent aussi le retour haptique système lorsqu’il est activé.
+
+## Mise à jour Android 1.6.7
+
+La palette Android associe un vert menthe vif à des accents bleu, violet, corail et soleil. La prochaine activité et le bouton d’ajout rapide ont leurs propres dégradés; le thème sombre système conserve des couleurs et contrastes lisibles. Les barres système suivent également le thème. Les changements restent limités à Android; l’interface iOS est inchangée.
+
+## Mise à jour Android 1.6.8
+
+Depuis les détails d’une activité, « Ajouter à l’agenda du téléphone » demande l’autorisation Android de lire les calendriers disponibles et d’y écrire, uniquement lorsque tu utilises cette action. Après autorisation, choisis le calendrier cible; l’activité (titre, date, heure, note et répétition) y est ajoutée directement. L’application ne lit pas les événements existants.
 
 ## Mise à jour interface 1.6.2
 

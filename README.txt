@@ -1,8 +1,8 @@
-MON PLANIFICATEUR — APPLICATION ANDROID 1.6.5
+MON PLANIFICATEUR — APPLICATION ANDROID 1.6.9
 
-L’APK Android 1.6.5 prêt à installer est fourni : `Mon-planificateur-Android-1.6.5.apk`. Pour le reconstruire, installe le JDK 17 et le SDK Android 35, puis lance `android\gradlew.bat assembleDebug`. Le fichier généré se trouve dans `android\app\build\outputs\apk\debug\app-debug.apk`.
+La source Android est en version 1.6.9. Pour générer l’APK, installe le JDK 17 et le SDK Android 35, puis lance `android\gradlew.bat assembleDebug`. Le fichier généré se trouve dans `android\app\build\outputs\apk\debug\app-debug.apk`.
 
-Téléchargement direct : https://github.com/Walter-001/MonPlanificateur/releases/download/v1.6.5/Mon-planificateur-Android-1.6.5.apk
+Dernière version publiée (1.6.5) : https://github.com/Walter-001/MonPlanificateur/releases/download/v1.6.5/Mon-planificateur-Android-1.6.5.apk
 
 Le dossier android contient aussi le projet Android Studio et le wrapper Gradle. Le SDK Android 35 et ses licences doivent être installés et acceptés avant la compilation.
 
@@ -41,3 +41,11 @@ Mise à jour 1.6.3 / 1.1.3 : le bouton d’impression ouvre le dialogue natif, l
 Mise à jour 1.6.4 / 1.1.4 : le logo Daily Flow fourni est intégré à l’en-tête, aux icônes de lancement Android et iOS et au manifeste de l’application web installable. L’image originale est conservée dans les projets source.
 
 Mise à jour Android 1.6.5 : un raccourci « Ajouter » est accessible en maintenant l’icône de l’application; les actions principales ont un retour haptique et une meilleure prise en charge des lecteurs d’écran.
+
+Mise à jour Android 1.6.6 : palette calme avec prise en charge du thème clair/sombre du système, y compris les barres système. Cette présentation ne s’applique qu’à Android.
+
+Mise à jour Android 1.6.7 : la palette calme évolue avec un vert menthe vif et des accents bleu, violet, corail et soleil. Les dégradés et la palette respectent le thème sombre Android et restent limités à Android.
+
+Mise à jour Android 1.6.8 : depuis les détails d’une activité, l’agenda Android s’ouvre avec l’événement prérempli (date, heure, note et répétition). L’ajout doit être confirmé dans l’application Agenda; aucune permission de calendrier n’est nécessaire.
+
+Mise à jour Android 1.6.9 : l’action agenda peut ajouter directement une activité au calendrier choisi. Android demande les permissions de calendrier au premier usage; l’application ne lit pas les événements existants.
