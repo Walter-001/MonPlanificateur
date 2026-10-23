@@ -2,7 +2,7 @@ MON PLANIFICATEUR — APPLICATION ANDROID 1.6.9
 
 La source Android est en version 1.6.9. Pour générer l’APK, installe le JDK 17 et le SDK Android 35, puis lance `android\gradlew.bat assembleDebug`. Le fichier généré se trouve dans `android\app\build\outputs\apk\debug\app-debug.apk`.
 
-Dernière version publiée (1.6.5) : https://github.com/Walter-001/MonPlanificateur/releases/download/v1.6.5/Mon-planificateur-Android-1.6.5.apk
+Dernière version publiée (1.6.9) : https://github.com/Walter-001/MonPlanificateur/releases/download/v1.6.9/Mon-planificateur-Android-1.6.9.apk
 
 Le dossier android contient aussi le projet Android Studio et le wrapper Gradle. Le SDK Android 35 et ses licences doivent être installés et acceptés avant la compilation.
 
